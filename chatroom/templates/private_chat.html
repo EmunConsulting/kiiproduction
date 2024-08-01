@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Private Chat with {{ user2.username }}
+{% endblock %}
+
+{% block content %}
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .message {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 10px;
+        max-width: 60%;
+        word-wrap: break-word;
+    }
+    .profile-image {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .message-content {
+        display: flex;
+        flex-direction: column;
+    }
+    .username {
+        font-weight: bold;
+    }
+    .message-text {
+        margin-top: 5px;
+    }
+    .message-sender {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+        text-align: right;
+    }
+    .message-receiver {
+        background-color: #f1f0f0;
+        align-self: flex-start;
+        text-align: left;
+    }
+    .chat-log {
+        display: flex;
+        flex-direction: column;
+    }
+    #chat-log {
+        border: 1px solid #ccc;
+        height: 500px;
+        overflow-y: scroll;
+        padding: 10px;
+    }
+    .divider {
+        margin-bottom: 0.5px;
+    }
+</style>
+
+<div class="chat-container">
+    <h6>Private Chat with: <b>{{ user2.username }}</b></h6>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <div id="chat-log" class="chat-log" style="font-size:12px;">
+        {% for message in messages %}
+            <div class="message {% if message.sender == request.user %}message-sender{% else %}message-receiver{% endif %}">
+                <img class="profile-image" src="{% static 'images/costline.jpg' %}">
+                <div class="message-content">
+                    <div class="username">{{ message.sender.username }}</div>
+                    <div class="message-text">{{ message.content }}</div>
+                    <hr class="divider">
+                    <div class="message-text" style="font-size:8px;">{{ message.created_on }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <input id="chat-message-input" type="text" style="width:90%; margin-top:10px;">
+    <input id="chat-message-submit" type="button" value="Send" class="btn btn-primary btn-sm" style="font-size:11px;">
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const chatId = "{{ chat.id }}";
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/private_chat/' + chatId + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('Received:', data);  // Debugging statement
+
+        const messageContainer = document.createElement('div');
+        const profileImageContainer = document.createElement('img');
+        const messageContentContainer = document.createElement('div');
+        const usernameContainer = document.createElement('div');
+        const messageTextContainer = document.createElement('div');
+
+        profileImageContainer.classList.add('profile-image');
+        profileImageContainer.src = "{% static 'images/costline.jpg' %}";
+
+        messageContainer.classList.add('message');
+        messageContentContainer.classList.add('message-content');
+        usernameContainer.classList.add('username');
+        messageTextContainer.classList.add('message-text');
+
+        usernameContainer.textContent = data.username;
+        messageTextContainer.textContent = data.message;
+
+        if (data.username === "{{ request.user.username }}") {
+            messageContainer.classList.add('message-sender');
+        } else {
+            messageContainer.classList.add('message-receiver');
+        }
+
+        messageContentContainer.appendChild(usernameContainer);
+        messageContentContainer.appendChild(messageTextContainer);
+        messageContainer.appendChild(profileImageContainer);
+        messageContainer.appendChild(messageContentContainer);
+        document.querySelector('#chat-log').appendChild(messageContainer);
+
+        // Scroll to the bottom of the chat log
+        const chatLog = document.querySelector('#chat-log');
+        chatLog.scrollTop = chatLog.scrollHeight;
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    const messageInputDom = document.querySelector('#chat-message-input');
+    const messageSubmitDom = document.querySelector('#chat-message-submit');
+
+    if (messageInputDom && messageSubmitDom) {
+        messageInputDom.focus();
+        messageInputDom.onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                messageSubmitDom.click();
+            }
+        };
+
+        messageSubmitDom.onclick = function(e) {
+            const message = messageInputDom.value;
+
+            // Send the message content via WebSocket
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+
+            messageInputDom.value = '';  // Clear the message input field
+        };
+    } else {
+        console.error('Message input or submit button not found in the DOM');
+    }
+});
+
+</script>
+{% endblock %}
+
+

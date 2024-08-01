@@ -1,0 +1,138 @@
+{% extends 'base_wot_sidebar.html' %}
+{% load static %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block content %}
+
+<style>
+  .log-in-wrapper{
+    width: 360px;
+    height: 450px;
+    margin: 2% auto;
+    background: transparent;
+    border: 3px solid var(--primary-color);
+    border-radius: 5px;
+    position: relative;
+}
+
+h3{
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.log-in-wrapper form{
+    width: 280px;
+    position: absolute;
+    top: 10px;
+    left: 40px;
+}
+
+form input{
+    width: 100%;
+    padding: 10px 5px;
+    margin: 5px 0;
+    border: 0;
+    border-bottom: 1px solid var(--secondary-color);
+    outline: none;
+    background: transparent;
+    color: var(--text-color);
+
+}
+
+::placeholder{
+    color: #fff;
+}
+
+.btn-box{
+    width: 100%;
+    margin: 30px auto;
+    text-align: center;
+}
+
+form button{
+    width: 250px;
+    height: 35px;
+    margin: 0 10px;
+    background: transparent;
+    border-radius: 30px;
+    border: 1px solid var(--secondary-color);
+    cursor: pointer;
+    color: var(--secondary-color);
+}
+
+.second-option{
+    text-decoration:none;
+    color:var(--accent-color);
+}
+</style>
+
+<div class="log-in-wrapper">
+
+    <form action="{% url 'register' %}" method="POST">
+        {% csrf_token %}
+
+        <h3>Register</h3>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.email.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.password1.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.password2.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="btn-box">
+            <button type="submit">Register</button>
+        </div>
+        <span>I have an account <a href="{% url 'login' %}" class="second-option"><b>Login</b></a></span>
+    </form>
+</div>
+
+{% endblock %}

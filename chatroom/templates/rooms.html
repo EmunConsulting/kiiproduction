@@ -1,0 +1,16 @@
+
+{% extends  'base.html' %}
+{% load static %}
+
+{% block title %}
+  Rooms
+{% endblock %}
+
+{% block content %}
+<h5>Available Rooms:</h5>
+{% for i in all_rooms %}
+<a href="{% url 'open_room' i.slug %}">{{i.name}}</a>
+<hr>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,90 @@
+
+{% extends  'base_wot_sidebar.html' %}
+{% load static %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block content %}
+
+<style>
+  .log-in-wrapper{
+    width: 360px;
+    height: 450px;
+    margin: 2% auto;
+    background: transparent;
+    border: 3px solid var(--primary-color);
+    border-radius: 5px;
+    position: relative;
+}
+
+h3{
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.log-in-wrapper form{
+    width: 280px;
+    position: absolute;
+    top: 10px;
+    left: 40px;
+}
+
+form input{
+    width: 100%;
+    padding: 10px 5px;
+    margin: 5px 0;
+    border: 0;
+    border-bottom: 1px solid var(--secondary-color);
+    outline: none;
+    background: transparent;
+    color: var(--text-color);
+
+}
+
+::placeholder{
+    color: #fff;
+}
+
+.btn-box{
+    width: 100%;
+    margin: 30px auto;
+    text-align: center;
+}
+
+form button{
+    width: 250px;
+    height: 35px;
+    margin: 0 10px;
+    background: transparent;
+    border-radius: 30px;
+    border: 1px solid var(--secondary-color);
+    cursor: pointer;
+    color: var(--secondary-color);
+}
+
+.second-option{
+    text-decoration:none;
+    color:var(--accent-color);
+}
+</style>
+
+<div class="log-in-wrapper">
+
+<form action="{% url 'login' %}" method="POST">
+  {% csrf_token %}
+
+<h3>Login</h3>
+<input type="text" name="username" placeholder="Username" required>
+<input type="password" name="password" placeholder="Password" required>
+
+<div class="btn-box">
+<button type="submit">Login</button>
+</div>
+<span>I don't have an account <a href="{% url 'register' %}" class="second-option"><b>Register</b></a></span>
+</form>
+
+</div>
+
+{% endblock %}

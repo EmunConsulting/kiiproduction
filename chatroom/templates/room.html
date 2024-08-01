@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {{ room.name }}
+{% endblock %}
+
+{% block content %}
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .message {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 10px;
+        max-width: 60%;
+        word-wrap: break-word;
+    }
+    .profile-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .message-content {
+        display: flex;
+        flex-direction: column;
+    }
+    .username {
+        font-weight: bold;
+    }
+    .message-text {
+        margin-top: 5px;
+    }
+    .message-sender {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+        text-align: right;
+    }
+    .message-receiver {
+        background-color: #f1f0f0;
+        align-self: flex-start;
+        text-align: left;
+    }
+    .chat-log {
+        display: flex;
+        flex-direction: column;
+    }
+    #chat-log {
+        border: 1px solid #ccc;
+        height: 500px;
+        overflow-y: scroll;
+        padding: 10px;
+    }
+</style>
+
+<div class="chat-container">
+    <h2>Room: {{ slug }}</h2>
+    <div id="chat-log" class="chat-log">
+        {% for message in messages %}
+            <div class="message {% if message.user == request.user %}message-sender{% else %}message-receiver{% endif %}">
+                <img class="profile-image" src="{% static 'images/costline.jpg' %}">
+                <div class="message-content">
+                    <div class="username">{{ message.user.username }}</div>
+                    <div class="message-text">{{ message.content }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <input id="chat-message-input" type="text" size="100">
+    <input id="chat-message-submit" type="button" value="Send">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const roomName = "{{ slug }}";
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+        );
+
+        chatSocket.onopen = function() {
+            console.log('WebSocket connection established');
+        };
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const messageContainer = document.createElement('div');
+            const profileImageContainer = document.createElement('img');
+            const messageContentContainer = document.createElement('div');
+            const usernameContainer = document.createElement('div');
+            const messageTextContainer = document.createElement('div');
+
+            profileImageContainer.classList.add('profile-image');
+            profileImageContainer.src = "{% static 'images/costline.jpg' %}";
+
+            messageContainer.classList.add('message');
+            messageContentContainer.classList.add('message-content');
+            usernameContainer.classList.add('username');
+            messageTextContainer.classList.add('message-text');
+
+            usernameContainer.textContent = data.username;
+            messageTextContainer.textContent = data.message;
+
+            if (data.username === "{{ request.user.username }}") {
+                messageContainer.classList.add('message-sender');
+            } else {
+                messageContainer.classList.add('message-receiver');
+            }
+
+            messageContentContainer.appendChild(usernameContainer);
+            messageContentContainer.appendChild(messageTextContainer);
+            messageContainer.appendChild(profileImageContainer);
+            messageContainer.appendChild(messageContentContainer);
+            document.querySelector('#chat-log').appendChild(messageContainer);
+        };
+
+        chatSocket.onerror = function(e) {
+            console.error('WebSocket error:', e);
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly:', e);
+        };
+
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const messageSubmitDom = document.querySelector('#chat-message-submit');
+
+        if (messageInputDom && messageSubmitDom) {
+            messageInputDom.focus();
+            messageInputDom.onkeyup = function(e) {
+                if (e.keyCode === 13) {  // enter, return
+                    messageSubmitDom.click();
+                }
+            };
+
+            messageSubmitDom.onclick = function(e) {
+                const message = messageInputDom.value;
+
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const room_id = "{{ room.id }}"; // Get the room ID
+                fetch('/send_message/' + room_id + '/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({
+                        'content': message,
+                    }),
+                })
+                .then(response => {
+                    console.log('Response:', response);
+                    if (response.headers.get('content-type').includes('application/json')) {
+                        return response.json().then(data => ({status: response.status, body: data}));
+                    } else {
+                        throw new Error('Unexpected response format');
+                    }
+                })
+                .then(response => {
+                    if (response.status >= 200 && response.status < 300) {
+                        console.log('Message sent successfully:', response.body);
+                    } else {
+                        console.error('Failed to send message:', response.body);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                });
+
+                messageInputDom.value = '';  // Clear the message input field
+            };
+        } else {
+            console.error('Message input or submit button not found in the DOM');
+        }
+    });
+</script>
+
+{% endblock %}
