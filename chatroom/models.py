@@ -11,6 +11,9 @@ class Room(models.Model):
     def __str__(self):
         return self.name
 
+    def unique_user_count(self):
+        return self.message_set.values('user').distinct().count()
+
 
 class Message(models.Model):
     content = models.TextField()

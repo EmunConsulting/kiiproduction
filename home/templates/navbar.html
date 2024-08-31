@@ -1,45 +1,61 @@
 {% load static %}
 
-<div ><a class="logo" href="{% url 'home' %}">KII</a></div>
 
-{% if user.is_authenticated %}
+<style>
+    .profile-img
+    {
+        width:40px;
+        height:40px;
+        border-radius:50%;
+    }
+    .logo
+    {
+        background: var(--bg-color);
+    }
+</style>
 
-    <div class="user-dropdown">
 
-        <button class="dropdown-btn" style="text-align: right;">
-        {% if profile_image %}
-            <img src="{{ profile_image.profile_image.url }}" alt="Profile Image" style=" width:50px; height:50px; border-radius: 50%; object-fit: cover;">
-        {% else %}
-            <img src="{% static 'images/costline.jpg' %}" alt="Default Profile Image" width="40" height="40" style="border-radius: 50%; object-fit: cover;">
-        {% endif %}
-        </button>
-        <div class="dropdown-content" style="font-size:12px;">
-
-            <a href="#">Profile Info</a>
-            <a href="{% url 'logout' %}">Logout</a>
-        </div>
-        <span style="font-size:10px;">{{user.first_name}} {{user.last_name}}</span>
+<nav>
+    <div class="nav-left">
+        <img src="{% static 'images/logo.png' %}" class="logo profile-img" >
     </div>
-{% else %}
+    <div class="nav-right">
 
-{% endif %}
+        <div class="nav-user-icon online" onclick="settingsMenuToggle()">
+            {% if user.profile.profile_picture %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-img">
+            {% else %}
+                <img src="{% static 'images/sunrise.jpg' %}" alt="Default Profile Picture" class="profile-img">
+            {% endif %}
+        </div>
+    </div>
+    <div class="settings-menu">
+        <div class="settings-menu-inner">
+            <div class="user-profile">
+            {% if user.profile.profile_picture %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-img">
+            {% else %}
+                <img src="{% static 'images/sunrise.jpg' %}" alt="Default Profile Picture" class="profile-img">
+            {% endif %}
+                <div>
+                    <p>{{ user.first_name}} {{ user.last_name }}</p>
+                    {% if user.profile.user %}
+                    <a href="{% url 'user_profile' user.id %}">See your profile</a>
+                    {% else %}
+                    <a href="{% url 'create_profile' %}">Create profile</a>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var dropdownBtn = document.querySelector('.dropdown-btn');
-        var dropdownContent = document.querySelector('.dropdown-content');
+            <div class="settings-links">
+                <img src="{% static 'images/logout.png' %}" class="settings-icon">
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
 
-        dropdownBtn.addEventListener('click', function() {
-            dropdownContent.classList.toggle('show');
-        });
 
-        // Optional: Close the dropdown if the user clicks outside of it
-        window.addEventListener('click', function(event) {
-            if (!event.target.matches('.dropdown-btn')) {
-                if (dropdownContent.classList.contains('show')) {
-                    dropdownContent.classList.remove('show');
-                }
-            }
-        });
-    });
-</script>
+
+

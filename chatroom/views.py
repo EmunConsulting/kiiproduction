@@ -1,10 +1,15 @@
 import json
 import logging
+
+from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from decorators import authentication_required
+from blog.models import Profile
+from decorators import authentication_required, paginate
+from .chatroom_deco import update_record, create_record, delete_record
+from .forms import RoomForm
 from .models import Room, Message, PrivateChat, PrivateMessage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -18,8 +23,25 @@ def rooms(request):
     return render(request, 'rooms.html', {'all_rooms': all_rooms})
 
 
+@create_record(Room, RoomForm, 'room_form.html', 'rooms', redirect_id=None)
+def create_room(request):
+    pass
+
+
+@update_record(Room, RoomForm, 'room_form.html', 'rooms', redirect_id=None)
+def update_room(request, pk):
+    pass
+
+
+@delete_record(Room, 'rooms', redirect_id=None)
+def delete_room(request, pk):
+    pass
+
+
 def users_list(request):
-    all_users = User.objects.all()
+    all_users = User.objects.prefetch_related(
+        Prefetch('profile', queryset=Profile.objects.all())
+    )
     return render(request, 'users_list.html', {'all_users': all_users})
 
 

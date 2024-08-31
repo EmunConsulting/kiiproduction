@@ -1,0 +1,137 @@
+{% extends  'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load group_tags %}
+
+{% block title %}
+  Events List
+{% endblock %}
+
+{% block content %}
+
+<style>
+.fa-pen {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+.profile-container
+{
+    display:flex;
+}
+.left-side
+{
+    width:50%;
+    display:flex;
+    flex-direction:column;
+}
+.middle-side
+{
+    width:30%;
+    font-size:12px;
+    display:flex;
+    flex-direction: column;
+}
+.right-side
+{
+    width:20%;
+    display:flex;
+    align-items: center;
+    justify-content:center;
+}
+h6
+{
+    font-size:13px;
+    font-weight:600;
+    color: var(--secondary-color);
+}
+a
+{
+    text-decoration:none;
+}
+</style>
+
+<h5>Events List:</h5>
+<hr>
+<div>
+    <a class="btn btn-primary btn-sm" href="{% url 'events_list' %}" >Show All</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'current_events_list' %}" >Current Only</a>
+</div>
+<br>
+
+{% for i in pla_pro %}
+    <div class="write-post-container">
+        <div class="post-input-container profile-container">
+            <div class="left-side" style="padding:4px;">
+                {{ i.program_name }}
+            </div>
+            <div class="middle-side">
+                <table class="table table-sm" style="font-size:12px;">
+                    <tbody>
+                        <tr>
+                            <th scope="row" style="color:gray;">Starts:</th>
+                            <td scope="row">{{ i.start_date }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="color:gray;">Ends:</th>
+                            <td scope="row">{{ i.end_date }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="right-side">
+
+                {% for k in app %}
+                    <!-- Check if program id with program id, current user id with user id, Approval == True   -->
+                    {% if i.id == k.program.id and user.id == k.user.id and k.approved == True %}
+                        <a id="approved-button-{{ i.id }}" href="#" class="btn btn-success btn-sm disabled">Approved</a>
+
+                    <!-- Check if program id with program id, current user id with user id, Approval == False   -->
+                    {% elif i.id == k.program.id and user.id == k.user.id and k.approved == False %}
+                        <a id="cancel-button-{{ i.id }}" href="{% url 'delete_application_user' k.id %}" class="btn btn-danger btn-sm">Cancel</a>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Remove this button using JS if any other button is populated  -->
+                    {% if i.start_date < current_day %}
+                        <a id="apply-button-{{ i.id }}" href="{% url 'create_application' i.id %}" class="btn btn-primary btn-sm disabled" style="font-style:italic;">Over due</a>
+                    {% else %}
+                        <a id="apply-button-{{ i.id }}" href="{% url 'create_application' i.id %}" class="btn btn-primary btn-sm">Apply</a>
+                    {% endif %}
+            </div>
+        </div>
+        <hr>
+        <p style="font-size:12px; margin-bottom:2px;"><b>Resources Provided:</b></p>
+        <span style="font-size:12px;">{{ i.resources_provided|linebreaksbr }}</span>
+    </div>
+{% endfor %}
+
+<hr>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Loop through each right-side container
+    document.querySelectorAll('.right-side').forEach(function(container) {
+        // Check if there are any Approved or Cancel buttons
+        const approvedButton = container.querySelector('a.btn-success');
+        const cancelButton = container.querySelector('a.btn-danger');
+
+        // If either button is present, hide the Apply button
+        if (approvedButton || cancelButton) {
+            const applyButton = container.querySelector('a.btn-primary');
+            if (applyButton) {
+                applyButton.style.display = 'none'; // Hide the Apply button
+            }
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

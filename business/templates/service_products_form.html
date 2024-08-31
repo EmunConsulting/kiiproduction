@@ -1,0 +1,21 @@
+{% extends  'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Service / Product
+{% endblock %}
+
+{% block content %}
+
+
+<h5>Service / Product Form:</h5>
+<hr>
+<form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary btn-sm mt-3">Register/Update</button>
+    <a class="btn btn-secondary btn-sm mt-3" href="{% url 'service_products_list' %}">Back to service or product list</a>
+</form>
+{% endblock %}
+

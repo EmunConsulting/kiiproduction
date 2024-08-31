@@ -1,16 +1,75 @@
-
 {% extends  'base.html' %}
 {% load static %}
+{% load group_tags %}
 
 {% block title %}
-  Rooms
+  Rooms List
 {% endblock %}
 
 {% block content %}
-<h5>Available Rooms:</h5>
-{% for i in all_rooms %}
-<a href="{% url 'open_room' i.slug %}">{{i.name}}</a>
+
+<style>
+.fa-pen {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+.profile-container
+{
+    display:flex;
+}
+.left-side
+{
+    width:70%;
+    display:flex;
+    flex-direction:column;
+}
+.right-side
+{
+    width:15%;
+}
+h6
+{
+    font-size:13px;
+    font-weight:600;
+    color: var(--secondary-color);
+}
+a
+{
+    text-decoration:none;
+}
+</style>
+
+
+<h5>Rooms List:</h5>
+
 <hr>
+{% if user|has_group:"admin" %}
+<div>
+    <a class="btn btn-primary btn-sm" href="{% url 'create_room' %}" >Create Room</a>
+</div>
+{% endif %}
+<br>
+
+{% for i in all_rooms %}
+    <div class="write-post-container">
+
+        <div class="post-input-container profile-container">
+            <div class="left-side">
+                <a href="{% url 'open_room' i.slug %}" >{{i.name}}</a>
+            </div>
+            <div class="right-side">
+                <span style="font-size:11px;">Users:</span> <b>{{i.unique_user_count}}</b>
+            </div>
+            {% if user|has_group:"admin" %}
+            <div>
+                <a href="{% url 'update_room' i.id %}" ><i class="fa-solid fa-pen"></i></a> &nbsp;&nbsp;
+                <a href="{% url 'delete_room' i.id %}" ><i class="fa-solid fa-trash"></i></a>
+            </div>
+            {% endif %}
+         </div>
+    </div>
 {% endfor %}
 
 {% endblock %}

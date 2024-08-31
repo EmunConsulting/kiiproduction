@@ -1,0 +1,64 @@
+{% extends  'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Service / Product List
+{% endblock %}
+
+{% block content %}
+
+<style>
+.fa-pen {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+
+a
+{
+    text-decoration:none;
+}
+table
+{
+    font-size:12px;
+}
+</style>
+
+<h5>Service / Products List:</h5>
+<hr>
+<div>
+    <a class="btn btn-primary btn-sm" href="{% url 'create_service_products' %}" >Add New Service / Product</a>
+</div>
+<br>
+
+    <div class="write-post-container">
+
+    <table class="table table-hover">
+        <thead class="content-font">
+            <tr class="content-font">
+                <th scope="col">Name</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in rec_list %}
+            <tr class="content-font">
+                <td>{{ i.service_products }}</td>
+                <td class="decision">
+                    <a class="act" href="{% url 'update_service_products' i.id %}"><i class="fa-solid fa-pen"></i></a>
+                </td>
+                <td class="decision">
+                    <a class="act close-icon delete-record-link" data-record-id="{{ i.pk }}" href="{% url 'delete_service_products' i.id %}"><i class="fa-solid fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </div>
+
+{% endblock %}
+

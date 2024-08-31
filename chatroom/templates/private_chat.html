@@ -7,10 +7,6 @@
 
 {% block content %}
 <style>
-    .chat-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
     .message {
         display: flex;
         align-items: flex-start;
@@ -37,12 +33,12 @@
         margin-top: 5px;
     }
     .message-sender {
-        background-color: #dcf8c6;
+
         align-self: flex-end;
-        text-align: right;
+        text-align: left;
     }
     .message-receiver {
-        background-color: #f1f0f0;
+
         align-self: flex-start;
         text-align: left;
     }
@@ -56,15 +52,16 @@
         overflow-y: scroll;
         padding: 10px;
     }
-    .divider {
-        margin-bottom: 0.5px;
+    .divider
+    {
+        margin:2px;
     }
 </style>
 
-<div class="chat-container">
+<div class="chat-container write-post-container">
     <h6>Private Chat with: <b>{{ user2.username }}</b></h6>
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    <div id="chat-log" class="chat-log" style="font-size:12px;">
+    <div id="chat-log" class="chat-log" style="font-size:14px;">
         {% for message in messages %}
             <div class="message {% if message.sender == request.user %}message-sender{% else %}message-receiver{% endif %}">
                 <img class="profile-image" src="{% static 'images/costline.jpg' %}">
@@ -72,7 +69,7 @@
                     <div class="username">{{ message.sender.username }}</div>
                     <div class="message-text">{{ message.content }}</div>
                     <hr class="divider">
-                    <div class="message-text" style="font-size:8px;">{{ message.created_on }}</div>
+                    <div class="message-text" style="font-size:10px;">{{ message.created_on }}</div>
                 </div>
             </div>
         {% endfor %}

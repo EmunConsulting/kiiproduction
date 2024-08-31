@@ -1,4 +1,9 @@
+from datetime import timedelta
+
 from django.contrib.auth import login, logout, authenticate
+from django.db.models import Count
+from django.utils import timezone
+
 from .forms import RegistrationForm
 from django.contrib.auth.models import Group
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,18 +13,31 @@ from django.shortcuts import render
 from decorators import unauthenticated_user, allowed_users, authentication_required
 from django.contrib.auth.decorators import login_required
 from . models import UserRecord, ProfileImage
-
+from blog.models import Post
 
 @login_required(login_url='login')
 def home(request):
+    # Today
+    current_date = timezone.now()
+
+    # Annotate posts with counts of likes and comments
+    posts = Post.objects.annotate(
+        like_count=Count('likes'),
+        comment_count=Count('comment')
+    ).order_by('-created_at')
+
+    # Add a flag for each post indicating whether it's within the 1-day limit
+    for post in posts:
+        post.is_recent = (timezone.now() - post.created_at) < timedelta(days=1)
+
     # Check if the welcome message has already been displayed
     if not request.session.get('welcome_message_displayed', False) and request.user.is_authenticated:
-        messages.success(request, str(request.user) + " " + ("logged in"))
+        messages.success(request, f"{request.user} logged in")
 
         # Set the session variable to True to indicate that the welcome message has been displayed
         request.session['welcome_message_displayed'] = True
 
-    return render(request, 'home.html', {})
+    return render(request, 'home.html', {'posts': posts, 'current_date': current_date})
 
 
 def access_denied(request):
@@ -38,12 +56,12 @@ def register_user(request):
             if user is not None:
                 login(request, user)
 
-                # Assign user to the "traveler" group
-                traveler_group, created = Group.objects.get_or_create(name='newUser')
-                user.groups.add(traveler_group)
+                # Assign user to the "newUser" group
+                newUser_group, created = Group.objects.get_or_create(name='newUser')
+                user.groups.add(newUser_group)
 
                 messages.success(request, "Registration Successful")
-                return redirect('home')  # Redirect to the page to add traveler details
+                return redirect('create_profile')  # Redirect to the page to add profile details
     else:
         form = RegistrationForm()
     return render(request, 'register_user.html', {'form': form})

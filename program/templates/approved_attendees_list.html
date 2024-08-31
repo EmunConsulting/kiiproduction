@@ -1,0 +1,83 @@
+{% extends  'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Approved Attendees List
+{% endblock %}
+
+{% block content %}
+
+<style>
+.fa-chalkboard-user {
+    color: var(--primary-color);
+}
+.list {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+
+a
+{
+    text-decoration:none;
+}
+table
+{
+    font-size:12px;
+}
+</style>
+
+<h5>Approved Attendees List:</h5>
+<hr>
+<a href="javascript:history.back()" class="btn btn-secondary btn-sm mt-3">Back</a><br>
+<br>
+
+    <div class="write-post-container">
+
+    <table class="table table-hover">
+        <thead class="content-font">
+            <tr class="content-font">
+                <th scope="col">Full Name</th>
+                <th scope="col">Program</th>
+                <th scope="col">Duration</th>
+                <th scope="col">Starts</th>
+                <th scope="col">Ends</th>
+
+                <th scope="col"></th>
+                <th scope="col"></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in app_att %}
+            <tr class="content-font">
+                <td>{{ i.user.first_name }} {{ i.user.last_name }}</td>
+                <td>{{ i.program }}</td>
+                <td>{{ i.program.duration }}</td>
+                <td>{{ i.program.start_date }}</td>
+                <td>{{ i.program.end_date }}</td>
+
+                <td class="decision">
+                    {% for men in mentors %}
+                    {% if i.user == men.user and i.program == men.program %}
+                    <a class="act" href="{% url 'show_mentor' i.user.id i.program.id %}" title="Show Assigned Mentor"><i class="fa-solid fa-chalkboard-user list"></i></a>
+                    {% else %}
+                    {% endif %}
+                    {% endfor %}
+                </td>
+                <td class="decision">
+                    <a class="act" href="{% url 'assign_mentor' i.user.id i.program.id %}" title="Assign Mentor"><i class="fa-solid fa-chalkboard-user"></i></a>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </div>
+
+
+{% endblock %}
+

@@ -1,0 +1,79 @@
+{% extends  'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Program Category List
+{% endblock %}
+
+{% block content %}
+
+<style>
+.fa-pen {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+.profile-container
+{
+    display:flex;
+}
+.left-side
+{
+    width:85%;
+    display:flex;
+    flex-direction:column;
+}
+.right-side
+{
+    width:15%;
+}
+h6
+{
+    font-size:13px;
+    font-weight:600;
+    color: var(--secondary-color);
+}
+a
+{
+    text-decoration:none;
+}
+</style>
+
+<h5>Program Category List:</h5>
+<hr>
+<div>
+    <a class="btn btn-primary btn-sm" href="{% url 'create_program_category' %}" >Add New Category</a>
+</div>
+<br>
+
+  <div class="write-post-container">
+
+    <table class="table table-hover">
+        <thead class="content-font">
+            <tr class="content-font">
+                <th scope="col">Name</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in pro_cat_lis %}
+            <tr class="content-font">
+                <td>{{ i.program_category }}</td>
+                <td class="decision">
+                    <a class="act" href="{% url 'update_development_stage' i.id %}"><i class="fa-solid fa-pen"></i></a>
+                </td>
+                <td class="decision">
+                    <a class="act close-icon delete-record-link" data-record-id="{{ i.pk }}" href="{% url 'delete_development_stage' i.id %}"><i class="fa-solid fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </div>
+{% endblock %}
+

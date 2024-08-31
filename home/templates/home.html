@@ -1,5 +1,5 @@
-
-{% extends  'base.html' %}
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% load static %}
 
 {% block title %}
@@ -7,18 +7,143 @@
 {% endblock %}
 
 {% block content %}
+<style>
+.fa-pen {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+.like-comment a
+{
+    text-decoration:none;
+    font-size:0.7rem;
+    color: var(--secondary-color);
+}
+</style>
 
-  <div class="container">
-    <div id="carousel01" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <img src="{% static 'images/sunrise.jpg' %}" class="d-block w-100" alt="...">
+<div class="main-content">
+
+    <div class="write-post-container">
+        <div class="post-input-container">
+            <div class="add-post-links">
+                <a href="{% url 'create_post' %}"><i class="fa-solid fa-plus"></i> New Post</a>
+            </div>
         </div>
-        <div class="carousel-item">
-          <img src="{% static 'images/costline.jpg' %}" class="d-block w-100" alt="...">
-        </div>
-      </div>
     </div>
-  </div>
+
+    <!-- POST STARTS HERE  -->
+    {% for post in posts %}
+    <div class="post-container">
+
+        <div class="post-row">
+            <div class="user-profile">
+                {% if post.user.profile.profile_picture %}
+                    <img src="{{ post.user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-img">
+                {% else %}
+                    <img src="{% static 'images/sunrise.jpg' %}" alt="Default Profile Picture" class="profile-img">
+                {% endif %}
+                <div>
+                    <p>{{ post.user.first_name }} {{ post.user.last_name }}</p>
+                    <span>{{ post.created_at }}</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="post-text">
+            {{ post.content|linebreaksbr }}
+        </p>
+
+        {% if post.image %}
+            <img src="{{ post.image.url }}" class="post-img">
+        {% endif %}
+
+        {% if post.video %}
+            <video controls class="post-video">
+                <source src="{{ post.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+
+        <div class="post-row">
+            <div class="activity-icons">
+                <div>
+                    {% if post.like_count > 0 %}
+                        <i class="fa-solid fa-thumbs-up">{{ post.like_count }}</i>
+                    {% else %}
+                        <i class="fa-regular fa-thumbs-up">&nbsp; 0</i>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if post.comment_count > 0 %}
+                        <i class="fa-solid fa-comments">{{ post.comment_count }}</i>
+                    {% else %}
+                        <i class="fa-regular fa-comment">&nbsp; 0</i>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="like-comment">
+                <a href="#" class="like-button" data-post-id="{{ post.id }}">
+                    {% if user in post.likes.all %}
+                        <i class="fa-solid fa-thumbs-up"></i>Unlike
+                    {% else %}
+                        <i class="fa-solid fa-thumbs-up"></i>Like
+                    {% endif %}
+                </a>&nbsp;
+                <a href="{% url 'create_comment' post.id %}"><i class="fa-solid fa-comment"></i>Comment</a>
+            </div>
+
+
+            {% if post.is_recent %}
+                <div class="post-profile-icon">
+                    <a href="{% url 'update_post' post.id %}"><i class="fa-solid fa-pen"></i></a>&nbsp;
+                    <a href="{% url 'delete_post' post.id %}"><i class="fa-solid fa-trash"></i></a>
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.like-button').on('click', function(e) {
+            e.preventDefault();
+
+            var postId = $(this).data('post-id');
+            var likeButton = $(this);
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "like_post" %}',
+                data: {
+                    'post_id': postId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.liked) {
+                        likeButton.html('<i class="fa-solid fa-thumbs-up"></i> Unlike');
+                    } else {
+                        likeButton.html('<i class="fa-solid fa-thumbs-up"></i> Like');
+                    }
+                    likeButton.closest('.post-row').find('.activity-icons div:first-child').html('<i class="fa-solid fa-thumbs-up"></i> ' + response.like_count);
+                },
+                error: function(response) {
+                    console.log('Error:', response);
+                }
+            });
+        });
+    });
+</script>
+
 
 {% endblock %}

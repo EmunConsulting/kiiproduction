@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}
+  User Profile
+{% endblock %}
+
+{% block content %}
+<style>
+.fa-pen {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+.profile-info
+{
+    font-size:0.8rem;
+}
+.profile-container
+{
+    display:flex;
+}
+.left-side
+{
+    width:25%;
+    display:flex;
+    flex-direction:column;
+}
+h6
+{
+    font-size:13px;
+    font-weight:600;
+    color: var(--secondary-color);
+}
+</style>
+
+<div class="main-content">
+
+    <div class="write-post-container">
+        <div class="post-input-container">
+            <div class="add-post-links">
+                {% if user.profile.cover_photo %}
+					<img src="{{ user.profile.cover_photo.url }}" alt="Profile Picture" style="width:100%; height:200px; object-fit: cover;">
+				{% else %}
+					<img src="{% static 'images/sunrise.jpg' %}" alt="Default Profile Picture" style="width:100%">
+				{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="write-post-container">
+        <div class="post-input-container profile-container">
+            <div class="left-side">
+            <span class="profile-info"><i class="fa-solid fa-user"></i>&nbsp;&nbsp;{{profile.user.first_name}} {{profile.user.last_name}}</span><br>
+            <span class="profile-info"><i class="fa-solid fa-person"></i>&nbsp;&nbsp;{{profile.gender}}</span><br>
+            <span class="profile-info"><i class="fa-solid fa-cake"></i>&nbsp;&nbsp;{{profile.birthdate}}</span><br>
+            <span class="profile-info"><i class="fa-solid fa-location-dot"></i>&nbsp;&nbsp;{{profile.country_origin}}</span><br>
+            <span class="profile-info"><i class="fa-solid fa-location"></i>&nbsp;&nbsp;{{profile.lives_in}}</span><br>
+            <span class="profile-info"><i class="fa-solid fa-address-book"></i>&nbsp;&nbsp;{{profile.address}}</span><br>
+            <span class="profile-info"><i class="fa-solid fa-mobile"></i>&nbsp;&nbsp;{{profile.phone_number}}</span><br>
+            </div>
+            <div class="right-side">
+            <h6>Learned at</h6>
+            <span class="profile-info"><i class="fa-solid fa-school"></i>&nbsp;&nbsp;{{profile.learned_at}}</span>&nbsp;&nbsp;
+            <hr>
+            <h6>Works at</h6>
+            <span class="profile-info"><i class="fa-solid fa-briefcase"></i>&nbsp;&nbsp;{{profile.works_at}}</span>&nbsp;&nbsp;
+            <hr>
+            <h6>Bio</h6>
+            <span class="profile-info"><i class="fa-solid fa-note-sticky"></i>&nbsp;&nbsp;{{profile.bio}}</span>&nbsp;&nbsp;
+            <hr>
+            <h6>Interest</h6>
+            <span class="profile-info"><i class="fa-solid fa-note-sticky"></i>&nbsp;&nbsp;{{profile.interest}}</span>&nbsp;&nbsp;
+            <hr>
+            <h6>Website</h6>
+            <span class="profile-info"><i class="fa-solid fa-globe"></i>&nbsp;&nbsp;{{profile.website}}</span>&nbsp;&nbsp;
+            </div>
+        </div>
+        <hr style="margin-bottom:2px;">
+        <div style="margin-left:88%;">
+
+        </div>
+    </div>
+
+    <!-- POST STARTS HERE  -->
+    {% for post in posts %}
+    <div class="post-container">
+
+        <div class="post-row">
+            <div class="user-profile">
+                {% if post.user.profile.profile_picture %}
+                    <img src="{{ post.user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-img">
+                {% else %}
+                    <img src="{% static 'images/sunrise.jpg' %}" alt="Default Profile Picture" class="profile-img">
+                {% endif %}
+                <div>
+                    <p>{{ post.user.first_name }} {{ post.user.last_name }}</p>
+                    <span>{{ post.created_at }}</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="post-text">
+            {{ post.content|linebreaksbr }}
+        </p>
+
+        {% if post.image %}
+            <img src="{{ post.image.url }}" class="post-img">
+        {% endif %}
+
+        {% if post.video %}
+            <video controls class="post-video">
+                <source src="{{ post.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+
+        <div class="post-row">
+            <div class="activity-icons">
+                <div>
+                    {% if post.like_count > 0 %}
+                        <i class="fa-solid fa-thumbs-up">{{ post.like_count }}</i>
+                    {% else %}
+                        <i class="fa-regular fa-thumbs-up">&nbsp; 0</i>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if post.comment_count > 0 %}
+                        <i class="fa-solid fa-comments">{{ post.comment_count }}</i>
+                    {% else %}
+                        <i class="fa-regular fa-comment">&nbsp; 0</i>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if post.is_recent %}
+                <div class="post-profile-icon">
+
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

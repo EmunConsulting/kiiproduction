@@ -8,14 +8,24 @@
 {% block content %}
 
 <style>
-  .log-in-wrapper{
+
+body
+{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.log-in-wrapper{
     width: 360px;
-    height: 450px;
-    margin: 2% auto;
+    height: 550px;
     background: transparent;
+    margin-top:50px;
     border: 3px solid var(--primary-color);
     border-radius: 5px;
     position: relative;
+    color: var(--primary-color);
+
 }
 
 h3{
@@ -43,7 +53,7 @@ form input{
 }
 
 ::placeholder{
-    color: #fff;
+    color: var(--secondary-color);
 }
 
 .btn-box{
@@ -89,6 +99,28 @@ form button{
             {% if form.username.errors %}
                 <div class="alert alert-danger">
                     {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.first_name.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.last_name.errors %}
                         <p>{{ error }}</p>
                     {% endfor %}
                 </div>

@@ -1,0 +1,49 @@
+{% load static %}
+{% load group_tags %}
+
+
+{% block left-sidebar %}
+
+<style>
+i
+{
+    margin-right:6px;
+    font-size:15px;
+}
+i .fa-square
+{
+    font-size:8px;
+}
+
+</style>
+<br>
+    <div class="imp-links">
+        <a href="{% url 'home' %}"><i class="fa-solid fa-home"></i>Posts</a>
+        <a href="{% url 'events_list' %}"><i class="fa-solid fa-calendar"></i>Events</a>
+        <a href="{% url 'users_list' %}"><i class="fa-solid fa-users"></i>Users</a>
+        <a href="{% url 'rooms' %}"><i class="fa-solid fa-people-roof"></i>Rooms</a>
+        <a href="{% url 'business_list' %}"><i class="fa-solid fa-briefcase"></i>My Business</a>
+    </div>
+
+{% if user|has_group:"admin" %}
+    <div class="shortcut-links">
+        <p>Manage</p>
+        <a href="{% url 'planned_program_list' %}"><i class="fa-solid fa-square"></i>Planned Programs</a>
+        <a href="{% url 'pending_application_list' %}"><i class="fa-solid fa-square"></i>Pending Applications</a>
+        <a href="{% url 'fund_record_list' %}"><i class="fa-solid fa-square"></i>Fund Record</a>
+        <hr>
+        <a href="{% url 'program_list' %}"><i class="fa-solid fa-square"></i>L - Program</a>
+        <a href="{% url 'mentors_list' %}"><i class="fa-solid fa-square"></i>L - Mentors</a>
+        <a href="{% url 'investor_record_list' %}"><i class="fa-solid fa-square"></i>L - Investors</a>
+        <a href="{% url 'service_products_list' %}"><i class="fa-solid fa-square"></i>L - Service/Products</a>
+        <a href="{% url 'registration_status_list' %}"><i class="fa-solid fa-square"></i>L - Registration Status</a>
+        <a href="{% url 'development_stage_list' %}"><i class="fa-solid fa-square"></i>L - Development Stage</a>
+        <a href="{% url 'industry_sector_list' %}"><i class="fa-solid fa-square"></i>L - Industry Sector</a>
+        <a href="{% url 'fund_type_list' %}"><i class="fa-solid fa-square"></i>L - Fund Type</a>
+        <a href="{% url 'investor_type_list' %}"><i class="fa-solid fa-square"></i>L - Investor Type</a>
+        <a href="{% url 'program_category_list' %}"><i class="fa-solid fa-square"></i>L - Program Category</a>
+
+    </div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends  'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Show Mentor
+{% endblock %}
+
+{% block content %}
+
+<style>
+.fa-chalkboard-user {
+    color: var(--primary-color);
+}
+.list {
+    color: var(--secondary-color);
+}
+.fa-trash {
+    color: var(--accent-color);
+}
+
+a
+{
+    text-decoration:none;
+}
+table
+{
+    font-size:12px;
+}
+</style>
+
+<h5>Approved Attendees List:</h5>
+<hr>
+<a href="javascript:history.back()" class="btn btn-secondary btn-sm mt-3">Back</a><br>
+<br>
+
+    <div class="write-post-container">
+
+    <table class="table table-hover">
+        <thead class="content-font">
+            <tr class="content-font">
+                <th scope="col">Mentor Full Name</th>
+                <th scope="col">Mentee Full Name</th>
+                <th scope="col">Program Name</th>
+                <th scope="col">Starts</th>
+                <th scope="col">Ends</th>
+
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in rec %}
+            <tr class="content-font">
+                <td>{{ i.mentor.user.first_name }} {{ i.mentor.user.last_name }}</td>
+                <td>{{ i.user.first_name }} {{ i.user.last_name }}</td>
+                <td>{{ i.program }}</td>
+                <td>{{ i.assigned_on }}</td>
+                <td>{{ i.assigned_until }}</td>
+
+                <td class="decision">
+                    <a class="act" href="{% url 'update_mentorship' i.id %}"><i class="fa-solid fa-pen"></i></a>
+                </td>
+                <td class="decision">
+                    <a class="act close-icon delete-record-link" data-record-id="{{ i.pk }}" href="{% url 'delete_mentorship' i.id %}"><i class="fa-solid fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </div>
+
+
+{% endblock %}
+

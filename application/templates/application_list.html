@@ -1,0 +1,71 @@
+{% extends  'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Application List
+{% endblock %}
+
+{% block content %}
+
+<style>
+table
+{
+    font-size:12px;
+}
+a
+{
+    text-decoration:none;
+}
+.fa-check
+{
+    color: var(--primary-color)
+}
+.fa-xmark
+{
+    color: var(--secondary-color)
+}
+</style>
+
+<h5>Application List:</h5>
+<hr>
+<div>
+    <a class="btn btn-primary btn-sm" href="{% url 'application_list' %}" >Show All</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'pending_application_list' %}" >Show Pending</a>
+</div>
+<br>
+
+<div class="write-post-container">
+    <table class="table table-hover">
+        <thead class="content-font">
+            <tr class="content-font">
+                <th scope="col">User</th>
+                <th scope="col">Event</th>
+                <th scope="col">Requested On</th>
+                <th scope="col">Approved</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in app_lis %}
+            <tr class="content-font">
+                <td><a class="act" href="{% url 'user_profile_minimal' i.user.id %}">{{ i.user.first_name }} {{ i.user.last_name }}</a></td>
+                <td>{{ i.program }}</td>
+                <td>{{ i.requested_on }}</td>
+                <td>{% if i.approved %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-xmark"></i> {% endif %}</td>
+
+                <td class="decision">
+                    {% if i.approved %}
+                    {% else %}
+                    <a class="act" href="{% url 'approve_application' i.id %}">Approve</a>
+                    {% endif %}
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
